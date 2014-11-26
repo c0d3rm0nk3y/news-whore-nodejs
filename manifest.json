@@ -1,0 +1,30 @@
+{
+  "name": "news-whore",
+  "version" : "2.1",
+  "manifest_version": 2,
+  "minimum_chrome_version": "29",
+  "description": "",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlfIwvE6uR437Ao2rkpLNOiT8Ro2PF9CjzmjPjoS6/EIQx/YCDXfJDDvnCAwTC7Cobkypj+qkfrDcaQDiUy4AsuVCIqYvgAczp+0UYPC9TrDa4f68l6aD8RCxxNtlor8vRorlB0tCedNY/v4eWa/GstaM6ivFK/Lf63pZcVsroo19UskPlna2s6RJ3iOkGE13FgOAv0cerRaeJjLibo7FeIPR37OBzvu6794MU3RmY8IkJUjG8N1h1o4mvw9ISVcBlO8gIBzTVlN98LSnW1IYj2I2bTwz4qI1Wp2QssVpmCwu79sInTw++10Y5ffCRNcbuXpPFzpx3cDC6JM5C0MVyQIDAQAB",
+  "icons" : {
+    "16" :  "images/monkey-16.png",
+    "48" :  "images/monkey-48.png",
+    "128" : "images/monkey-128.png"
+  },
+  "background": {
+    "persistent" : true,
+    "scripts" : ["background.js"]
+  },
+  "permissions": [ "identity", "https://accounts.google.com/*", "https://www.googleapis.com/*", "tabs", "<all_urls>"],
+  "oauth2": {
+    "client_id": "116823597102-i98nlbqvrv25fj9odj7la2m3nlkeuk2v.apps.googleusercontent.com",
+    "scopes" : ["https://www.googleapis.com/auth/plus.login"]
+  },
+
+  "browser_action" : {
+    "default_title" : "That's the tool tip",
+    "default_popup" : "popup.html",
+    "default_icon" : "images/monkey-48.png"
+  }
+
+
+}
