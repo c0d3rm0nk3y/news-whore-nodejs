@@ -1,7 +1,15 @@
-var request = require('request');
-var User    = require('../app/models/user');
-var q       = require('q');
-var read    = require('node-readability');
+var request      = require('request');
+var User         = require('../app/models/user');
+var q            = require('q');
+var read         = require('node-readability');
+var html_strip   = require('htmlstrip-native');
+var sanitizeHtml = require('sanitize-html');
+
+var options = {
+        include_script : false,
+        include_style : false,
+        compact_whitespace : true
+    };
 
 // app/routes.js
 module.exports = function(app, passport) {
@@ -108,8 +116,18 @@ module.exports = function(app, passport) {
           console.log(err);
           d.reject(err);
         }
-        console.log(article.content);
-        d.resolve(article.content);
+
+        var text = html_strip.html_strip(article.content,options);
+        console.log('!--article start--!\n\n');
+        console.log(article.title);
+        console.log(text);
+        console.log('\n\n!--article stop--!');
+        var cnt = {
+          "title" : article.title,
+          "content" : article.content,
+          "text" : text
+        };
+        d.resolve(cnt);
       });
       return d.promise;
     }catch(e) { d.reject(e); }
