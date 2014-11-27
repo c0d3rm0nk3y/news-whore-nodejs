@@ -10,6 +10,7 @@ module.exports = function(app, passport) {
 	// HOME PAGE (with login links) ========
 	// =====================================
 	app.get('/', function(req, res) {
+	  console.log('root');
 		res.render('index.ejs'); // load the index.ejs file
 	});
 
@@ -23,15 +24,20 @@ module.exports = function(app, passport) {
 		res.render('login.ejs', { message: req.flash('loginMessage') });
 	});
 
-  app.post('/submitArticle', function(req, res) {
-    console.log('submitArticle: link: %s\ntoken: %s', req.body.link, req.body.token);
-    var link = req.body.link;
-    var token = req.body.token;
+  app.get('/submitArticle', function(req, res) {
+    console.log('i am here..');
+    console.warn('dum dee dum dum deeer');
+    console.log('submitArticle: link: %s\ntoken: %s', req.query.link, req.query.token);
+    var link = req.query.link;
+
+    var token = req.query.token;
     isUser(token, link).then(
       function(art) {
+        console.log('isUser().response()');
         res.json(art);
       },
       function(err) {
+        console.log('isUser().reject()');
         res.json(err);
       });
     // request.post(
@@ -45,7 +51,7 @@ module.exports = function(app, passport) {
     //         {$push: { "links" : req.body.link}},
     //         { safe: true, upsert: true},
     //         function(err, user) {
-    //           console.log(err);
+    //           console.log(err);d
     //           res.json(user);
     //         }
     //       );
@@ -59,15 +65,17 @@ module.exports = function(app, passport) {
     var d =  q.defer();
     try {
       request.post(
-      'https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=' + req.body.token,
+      'https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=' + token,
       {},
       function(error, response, body) {
         if(!error && response.statusCode == 200) {
           var r = JSON.parse(body);
           User.findOne({'google.id' : r.user_id}, function(err, user) {
             if(err) {
+              console.log(err);
               d.reject(err);
             } else {
+              console.log('user found..');
               procArt(link).then(
                 function(art) {
                   d.resolve(art);
@@ -83,12 +91,12 @@ module.exports = function(app, passport) {
           d.reject(new Error("status code: " + response.statusCode));
         }
       });
-
+      return d.promise;
     } catch(ex) {
       console.log(ex);
       d.reject(ex);
     }
-    return d.promise();
+    return d.promise;
   }
 
   procArt = function(link) {
@@ -96,10 +104,14 @@ module.exports = function(app, passport) {
     var d = q.defer();
     try {
       read(link, function(err, article, meta) {
-        if(err) { d.reject(err); }
-
-        d.resolve(article);
+        if(err) {
+          console.log(err);
+          d.reject(err);
+        }
+        console.log(article.content);
+        d.resolve(article.content);
       });
+      return d.promise;
     }catch(e) { d.reject(e); }
     return d.promise;
   }
