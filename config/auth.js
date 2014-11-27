@@ -4,9 +4,9 @@
 module.exports = {
 
 	'googleAuth' : {
-		'clientID' 		: '116823597102-72kant6pj0pog35cilnmh61oevon2ilp.apps.googleusercontent.com',
-		'clientSecret' 	: 'G-sMmV3fCzGUNEoVPLpGsyVk',
-		'callbackURL' 	: 'http://monkey-nodejs-71725.usw1.nitrousbox.com:8080/auth/google/callback'
+		'clientID' 		: '116823597102-m3bidqpqtb7sibqa965t22b4vih90h84.apps.googleusercontent.com',
+		'clientSecret' 	: 'mq7daQ8lJQwuFA0sUl9YwAo8',
+		'callbackURL' 	: 'http://localhost:8080/auth/google/callback'
 	}
 
 };

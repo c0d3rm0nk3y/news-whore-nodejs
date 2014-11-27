@@ -1,5 +1,7 @@
 var request = require('request');
-var User     		= require('../app/models/user');
+var User    = require('../app/models/user');
+var q       = require('q');
+var read    = require('node-readability');
 
 // app/routes.js
 module.exports = function(app, passport) {
@@ -20,43 +22,87 @@ module.exports = function(app, passport) {
 		// render the page and pass in any flash data if it exists
 		res.render('login.ejs', { message: req.flash('loginMessage') });
 	});
-  
+
   app.post('/submitArticle', function(req, res) {
     console.log('submitArticle: link: %s\ntoken: %s', req.body.link, req.body.token);
-    //res.json({message: 'feature coming soon..'});
-    // https://www.googleapis.com/oauth2/v1/tokeninfo
-    request.post(
+    var link = req.body.link;
+    var token = req.body.token;
+    isUser(token, link).then(
+      function(art) {
+        res.json(art);
+      },
+      function(err) {
+        res.json(err);
+      });
+    // request.post(
+    //   'https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=' + req.body.token,
+    //   {},
+    //   function(error, response, body) {
+    //     if(!error && response.statusCode == 200) {
+    //       var r = JSON.parse(body);
+    //       User.findOneAndUpdate(
+    //         {'google.id' : r.user_id},
+    //         {$push: { "links" : req.body.link}},
+    //         { safe: true, upsert: true},
+    //         function(err, user) {
+    //           console.log(err);
+    //           res.json(user);
+    //         }
+    //       );
+    //     }
+    //   }
+    // );
+  });
+
+  isUser = function(token, link) {
+    console.log('isUser()..');
+    var d =  q.defer();
+    try {
+      request.post(
       'https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=' + req.body.token,
       {},
-      function(error, response, body) {               
+      function(error, response, body) {
         if(!error && response.statusCode == 200) {
           var r = JSON.parse(body);
-          
-          
-          
-          User.findOneAndUpdate(
-            {'google.id' : r.user_id},
-            {$push: { "links" : req.body.link}},
-            { safe: true, upsert: true},
-            function(err, user) {
-              console.log(err);
-              res.json(user);
+          User.findOne({'google.id' : r.user_id}, function(err, user) {
+            if(err) {
+              d.reject(err);
+            } else {
+              procArt(link).then(
+                function(art) {
+                  d.resolve(art);
+                },
+                function(err) {
+                  d.reject(err);
+                }
+              );
+
             }
-          );
-          
-//           User.findOne({'google.id': r.user_id}, 'google.name links', function(err, user) {
-//             if(err) res.json(err);
-//             user.links.update($push())
-//             res.json(user);
-//           });
-          //res.json(r);
-          //console.log(r);
+          });
+        } else {
+          d.reject(new Error("status code: " + response.statusCode));
         }
-      }
-    );
-    // hit up https://www.googleapis.com/oauth2/v1/tokeninfo to get user info
-    
-  });
+      });
+
+    } catch(ex) {
+      console.log(ex);
+      d.reject(ex);
+    }
+    return d.promise();
+  }
+
+  procArt = function(link) {
+    console.log('procArt()..');
+    var d = q.defer();
+    try {
+      read(link, function(err, article, meta) {
+        if(err) { d.reject(err); }
+
+        d.resolve(article);
+      });
+    }catch(e) { d.reject(e); }
+    return d.promise;
+  }
 
 	// process the login form
 	app.post('/login', passport.authenticate('local-login', {
@@ -81,7 +127,7 @@ module.exports = function(app, passport) {
 		failureRedirect : '/signup', // redirect back to the signup page if there is an error
 		failureFlash : true // allow flash messages
 	}));
-  
+
 	// =====================================
 	// GOOGLE ROUTES =======================
 	// =====================================
@@ -118,7 +164,7 @@ module.exports = function(app, passport) {
 	});
 };
 
-// route middleware to make sure 
+// route middleware to make sure
 function isLoggedIn(req, res, next) {
 
 	// if user is authenticated in the session, carry on
