@@ -31,6 +31,10 @@ module.exports = function(app, passport) {
 		// render the page and pass in any flash data if it exists
 		res.render('login.ejs', { message: req.flash('loginMessage') });
 	});
+  
+  app.get('/allArticles', function(req, res) {
+    
+  });
 
   app.get('/submitArticle', function(req, res) {
     console.log('i am here..');
@@ -48,24 +52,7 @@ module.exports = function(app, passport) {
         console.log('isUser().reject()');
         res.json(err);
       });
-    // request.post(
-    //   'https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=' + req.body.token,
-    //   {},
-    //   function(error, response, body) {
-    //     if(!error && response.statusCode == 200) {
-    //       var r = JSON.parse(body);
-    //       User.findOneAndUpdate(
-    //         {'google.id' : r.user_id},
-    //         {$push: { "links" : req.body.link}},
-    //         { safe: true, upsert: true},
-    //         function(err, user) {
-    //           console.log(err);d
-    //           res.json(user);
-    //         }
-    //       );
-    //     }
-    //   }
-    // );
+    
   });
 
   isUser = function(token, link) {
@@ -204,3 +191,24 @@ function isLoggedIn(req, res, next) {
 	// if they aren't redirect them to the home page
 	res.redirect('/');
 }
+
+
+// random crap
+// request.post(
+    //   'https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=' + req.body.token,
+    //   {},
+    //   function(error, response, body) {
+    //     if(!error && response.statusCode == 200) {
+    //       var r = JSON.parse(body);
+    //       User.findOneAndUpdate(
+    //         {'google.id' : r.user_id},
+    //         {$push: { "links" : req.body.link}},
+    //         { safe: true, upsert: true},
+    //         function(err, user) {
+    //           console.log(err);d
+    //           res.json(user);
+    //         }
+    //       );
+    //     }
+    //   }
+    // );
