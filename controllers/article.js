@@ -32,7 +32,8 @@ exports.getArticles = function(req, res) {
   console.log('postArticles().. \nquery: %s\nuser: %s', req.query, req.user);
   console.log('postArticles().. filter: ', req.query.filter);
   var filter = req.query.filter;
-  filter = filter.replace('+', ' ');
+  if(filter !== undefined)
+    filter = filter.replace('+', ' ');
   Article.find({userId: req.user._id}, filter , function(err, artsFnd) {
     if(err) { res.send(err); }
     else {

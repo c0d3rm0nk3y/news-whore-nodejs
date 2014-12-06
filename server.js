@@ -3,6 +3,7 @@ var mongoose    = require('mongoose');
 var bodyParser  = require('body-parser');
 var articleCtrl = require('./controllers/article');
 var userCtrl    = require('./controllers/user');
+var srchCtrl    = require('./controllers/search');
 var passport    = require('passport');
 var authCtrl    = require('./controllers/auth');
 
@@ -16,8 +17,13 @@ app.use(passport.initialize());
 
 var router = express.Router();
 
-// Create endpoint handler for /search
+// Create endpoint handler for /findFeeds
+router.route('/findFeeds')
+  .get(authCtrl.isAuthenticated, srchCtrl.findFeeds);
 
+// Create endpoint handler for /findFeed
+router.route('/getFeed')
+  .get(authCtrl.isAuthenticated, srchCtrl.getFeed);
 
 // Create endoint handler for /users
 router.route('/users')
