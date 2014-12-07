@@ -15,7 +15,7 @@ exports.postArticles = function(req, res) {
       if(foundArt !== null) {
         res.json({message: 'article already submitted', data: foundArt});
       } else {
-        newswhore.buildArticle(link, uId).then(
+        newswhore.buildAndSaveArticle(link, uId).then(
           function(result) {
             res.json(result);
           }, function(err) {

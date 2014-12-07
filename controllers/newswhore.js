@@ -8,15 +8,14 @@ var options = {
         compact_whitespace : true };
 
 
-exports.buildArticle = function(link, id) {
+exports.buildAndSaveArticle = function(link, id) {
   console.log('buildArticle()..\nLink: %s\nid: %s', link, id);
   var d = q.defer();
   try {
     read(link, function(err, article, meta) {
       console.log('buildArticle().read()..');
       if(err) { d.reject(err); }
-      else {
-        
+      else {  
         var art = new Article();
         art.link = link;
         art.userId = id;

@@ -18,12 +18,16 @@ app.use(passport.initialize());
 var router = express.Router();
 
 // Create endpoint handler for /findFeeds
-router.route('/findFeeds')
-  .get(authCtrl.isAuthenticated, srchCtrl.findFeeds);
+router.route('/findFeeds').get(authCtrl.isAuthenticated, srchCtrl.findFeeds);
 
 // Create endpoint handler for /findFeed
-router.route('/getFeed')
-  .get(authCtrl.isAuthenticated, srchCtrl.getFeed);
+router.route('/getFeed').get(authCtrl.isAuthenticated, srchCtrl.getFeed);
+
+// Create endpoint handler for /processFeed
+router.route('/processFeed').get(authCtrl.isAuthenticated, srchCtrl.processFeed);
+
+// Create endpoint handler for /searchNews
+router.route('/searchNews').get(authCtrl.isAuthenticated, srchCtrl.searchNews);
 
 // Create endoint handler for /users
 router.route('/users')
