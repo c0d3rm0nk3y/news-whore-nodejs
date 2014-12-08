@@ -41,9 +41,10 @@ router.route('/articles')
 
 // create endpoint handlers for /articles/:articles_id
 router.route('/articles/:article_id')
+  .delete(authCtrl.isAuthenticated, articleCtrl.deleteArticle)
   .get(authCtrl.isAuthenticated, articleCtrl.getArticle)
-  .put(authCtrl.isAuthenticated, articleCtrl.putArticle)
-  .delete(authCtrl.isAuthenticated, articleCtrl.deleteArticle);
+  .put(authCtrl.isAuthenticated, articleCtrl.putArticle);
+  
 
 // Register all our routes with /api
 app.use('/api', router);

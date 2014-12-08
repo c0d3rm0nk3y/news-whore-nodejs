@@ -56,7 +56,8 @@ exports.searchNews = function(req, res) {
   keywords = keywords.split(' ').join('+');
   console.log('Keywords:' + keywords);
   // build link
-  var link = 'https://news.google.com/news?q='+ keywords + '&num=0&output=rss';
+  // include in the url parameters for num and scoring
+  var link = 'https://news.google.com/news?q='+ keywords + '&num=0&output=rss&scoring=o';
   
   try {
     // get rss
@@ -73,14 +74,4 @@ exports.searchNews = function(req, res) {
     res.send(ex);
   }
   
-}
-
-buildGoogleNews = function(keywords) {
-  try {
-    var link = "https://news.google.com/news/story?ncl=dqfAgonXGJQTZEMPheUYg_A_ytaHM&q=" + keywords + "&lr=English&hl=en&sa=X&ei=GW6EVJLAMND9yQSTxIKoBQ&ved=0CCsQqgIwAA&output=rss";
-    return link;
-  } catch(ex) {
-    console.log(ex);
-    return ex;
-  }
 }
