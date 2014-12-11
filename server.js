@@ -6,14 +6,23 @@ var userCtrl    = require('./controllers/user');
 var srchCtrl    = require('./controllers/search');
 var passport    = require('passport');
 var authCtrl    = require('./controllers/auth');
+var cors        = require('cors');
 
 mongoose.connect('mongodb://datawhore:badCodeMonkey01!@ds027799.mongolab.com:27799/news');
 
 var app = express();
 
 app.use(bodyParser.urlencoded( { extended: true }));
+// app.use(cors);
 
 app.use(passport.initialize());
+
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "http://127.0.0.1:51792");  //http://127.0.0.1:51792
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Credentials");
+  res.header("Access-Control-Allow-Credentials", "true");
+  next();
+});
 
 var router = express.Router();
 

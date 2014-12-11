@@ -59,11 +59,15 @@ exports.searchNews = function(req, res) {
   var num = req.query.num;
   var when =req.query.when;
   var today = new Date();
+  console.log('when: %s', when);
   // for filters umm..
   // sort=o|n when=today|week|month 
   keywords = keywords.split(' ').join('+');
+  if(when !== null) {
+    num = 100;
+    scoring = 'n';
+  }
   
-  console.log('when:' + when);
   // build link
   // include in the url parameters for num and scoring
   var link = 'https://news.google.com/news?q='+ keywords + '&num=' + num + '&output=rss&scoring=' + scoring;
@@ -75,9 +79,24 @@ exports.searchNews = function(req, res) {
       var result = [];
 
       for(var i=0; i<articles.length; i++) {
-        console.log("Article Age: %s", daydiff(articles[i].published))
+        var age = daydiff(articles[i].published);
         var r = { "title" : articles[i].title, "published" : articles[i].published, "link" : gup('url', articles[i].link) };
+        //console.log("Article Age: %s", daydiff(articles[i].published));
         result.push(r);
+        if(when === "today" && age <= 1) {
+          console.log('today filter: age: %s', age);
+          result.push({ "title" : articles[i].title, "published" : articles[i].published, "link" : gup('url', articles[i].link) });
+        } else if(when === "week" & age >= 7.0) {
+          console.log('week filter: age: %s', age);
+          result.push({ "title" : articles[i].title, "published" : articles[i].published, "link" : gup('url', articles[i].link) });  
+        } else if(when === "month" && age <= 30) {
+          console.log('month filter: age: %s', age);
+          result.push({ "title" : articles[i].title, "published" : articles[i].published, "link" : gup('url', articles[i].link) });
+        } else if(when === null) {
+          console.log('no when filter: age: %s', age);
+          result.push({ "title" : articles[i].title, "published" : articles[i].published, "link" : gup('url', articles[i].link) });
+        }
+        
       }
       res.json(result);
     });
