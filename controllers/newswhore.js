@@ -9,7 +9,7 @@ var options = {
 
 
 exports.buildAndSaveArticle = function(link, id) {
-  console.log('buildArticle()..\nLink: %s\nid: %s', link, id);
+  console.log('%s: buildArticle()..\nLink: %s\nid: %s',new Date().toTimeString(), link, id);
   var d = q.defer();
   try {
     read(link, function(err, article, meta) {
@@ -22,7 +22,11 @@ exports.buildAndSaveArticle = function(link, id) {
         art.title = article.title;
         art.html = article.html;
         art.content = article.content;
-        art.text = html_strip.html_strip(article.content,options);
+        try {
+          art.text = html_strip.html_strip(article.content,options);
+        } catch(ex) {
+          art.text = "parse failure";
+        }
         art.save(function(err) {
           if(err) d.reject(err);
           d.resolve({messaage: 'article added', data: art});

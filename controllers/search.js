@@ -29,6 +29,7 @@ exports.findFeeds = function(req, res) {
   } catch(e) { res.send(e);}
 }
 
+/**
 exports.scrubArticle = function(req, res) {
   console.log('%s: scrubArticle()', new Date().toTimeString());
   try {
@@ -41,6 +42,7 @@ exports.scrubArticle = function(req, res) {
      
   } catch(ex) { console.log('scrubArticle() ex: %s', ex); }
 }
+**/
 
 getReadability = function(link, index) {
   console.log('%s: getReadability()\nindex:%s\n%s\n', new Date().toTimeString(), index, link);

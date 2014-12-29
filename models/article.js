@@ -11,4 +11,4 @@ var ArticleSchema = new mongoose.Schema({
   userId : String
 });
 
-module.exports = mongoose.model('Article', ArticleSchema);
+module.exports = mongoose.model('Article', ArticleSchema);  

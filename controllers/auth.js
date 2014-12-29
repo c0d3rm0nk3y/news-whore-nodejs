@@ -17,7 +17,8 @@ passport.use(new BasicStrategy(
 
         // Password did not match
         if (!isMatch) { return callback(null, false); }
-
+        
+        console.log('verifyPassword success!');
         // Success
         return callback(null, user);
       });

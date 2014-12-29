@@ -18,7 +18,7 @@ app.use(bodyParser.urlencoded( { extended: true }));
 app.use(passport.initialize());
 
 app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "http://127.0.0.1:33208");  //http://127.0.0.1:51792
+  res.header("Access-Control-Allow-Origin", "http://127.0.0.1:51792");  //http://127.0.0.1:51792
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Credentials");
   res.header("Access-Control-Allow-Credentials", "true");
   next();
@@ -27,19 +27,24 @@ app.use(function(req, res, next) {
 var router = express.Router();
 
 // Create endpoint handler for /findFeeds
-router.route('/findFeeds').get(authCtrl.isAuthenticated, srchCtrl.findFeeds);
+router.route('/findFeeds').
+  get(authCtrl.isAuthenticated, srchCtrl.findFeeds);
 
 // Create endpoint handler for /findFeed
-router.route('/getFeed').get(authCtrl.isAuthenticated, srchCtrl.getFeed);
+router.route('/getFeed').
+  get(authCtrl.isAuthenticated, srchCtrl.getFeed);
 
 // Create endpoint handler for /processFeed
-router.route('/processFeed').get(authCtrl.isAuthenticated, srchCtrl.processFeed);
+router.route('/processFeed').
+  get(authCtrl.isAuthenticated, srchCtrl.processFeed);
 
 // Create endpoint handler for /searchNews
-router.route('/searchNews').get(authCtrl.isAuthenticated, srchCtrl.searchNews);
+router.route('/searchNews').
+  get(authCtrl.isAuthenticated, srchCtrl.searchNews);
 
 // Create endpoint handler for /scrubArticle 
-router.route('/scrubArticle').get(authCtrl.isAuthenticated, srchCtrl.scrubArticle);
+router.route('/scrubArticle').
+  get(authCtrl.isAuthenticated, articleCtrl.scrubArticle);
 
 // Create endoint handler for /users
 router.route('/users')

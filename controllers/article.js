@@ -48,10 +48,64 @@ exports.getArticles = function(req, res) {
 exports.getArticle = function(req, res) { 
   console.log('getArticle():article_id');
   Article.find({ userId: req.user._id, _id: req.params.article_id }, function(err, artFnd) {
-    if(err) { res.send(err); } // not found or otherise  
-    else { res.json(artFnd); }  // found
+    if(err) { 
+      res.send(err); 
+    } else { res.json(artFnd); }  // found
   });
 };
+
+// Create endpoint /api/scrubArticle
+exports.scrubArticle = function(req,res) {
+  var index = req.query.index;
+  var uId   = req.user._id;
+  var link  = req.query.link;
+  console.log('%s: scrubArticle(req, res)..\n%s\n%s\n', new Date().toTimeString(), uId, req.query.link);
+  Article.findOne({ userId: uId, link: link }, function(err, artFnd) {
+    if(err) { // not found
+      console.log('err found.. %s', err);
+      res.json({type: 'skip', content :{ index: index, title: "", link : "", body : err }});
+    } else { 
+      if(artFnd === null) {
+        console.log('artFnd is null...');
+        newswhore.buildAndSaveArticle(link, uId).then(
+          function(result) {
+            //console.log(JSON.stringify(result,null,2));
+            //**article**
+            var article = {
+              type: 'article',
+              content: {
+                index : index,
+                title : result.title,
+                link : link,
+                body : result.text
+              }
+            };
+            res.json(article);
+            //res.json(result);
+          }, function(err) {
+            console.log(JSON.stringify(err, null, 2));
+            res.json({type: 'skip', content :{ index: index, title: "", link : "", body : err }});
+            //res.send(err);
+          }
+        );
+      } else {
+        console.log('artFnd found..');
+        //console.log(JSON.stringify(artFnd, null, 2));
+        var article = {
+          type: 'article',
+          content: {
+            index : index,
+            title : artFnd.title,
+            link : link,
+            body : artFnd.text
+          }
+        };
+        res.json(article);
+      }
+    }
+      
+  });
+}
 
 // Create endpoint /api/articles/:article_id for PUT
 exports.putArticle = function(req, res) {
