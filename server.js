@@ -1,4 +1,4 @@
-var express     = require('express');
+  var express     = require('express');
 var mongoose    = require('mongoose');
 var bodyParser  = require('body-parser');
 var articleCtrl = require('./controllers/article');
@@ -18,7 +18,7 @@ app.use(bodyParser.urlencoded( { extended: true }));
 app.use(passport.initialize());
 
 app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "http://127.0.0.1:51792");  //http://127.0.0.1:51792
+  res.header("Access-Control-Allow-Origin", "http://127.0.0.1:33208");  //http://127.0.0.1:51792
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Credentials");
   res.header("Access-Control-Allow-Credentials", "true");
   next();
@@ -37,6 +37,9 @@ router.route('/processFeed').get(authCtrl.isAuthenticated, srchCtrl.processFeed)
 
 // Create endpoint handler for /searchNews
 router.route('/searchNews').get(authCtrl.isAuthenticated, srchCtrl.searchNews);
+
+// Create endpoint handler for /scrubArticle 
+router.route('/scrubArticle').get(authCtrl.isAuthenticated, srchCtrl.scrubArticle);
 
 // Create endoint handler for /users
 router.route('/users')

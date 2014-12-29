@@ -36,11 +36,11 @@ exports.getArticles = function(req, res) {
   
   if(filter !== undefined)
     filter = filter.replace('+', ' ');
-  Article.find({userId: req.user._id}, filter , function(err, artsFnd) {
-    if(err) { res.send(err); }
-    else {
-      res.json(artsFnd);
-    }
+    Article.find({userId: req.user._id}, filter , function(err, artsFnd) {
+      if(err) { res.send(err); }
+      else {
+        res.json(artsFnd);
+      }
   });
 };
 
