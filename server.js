@@ -1,4 +1,4 @@
-  var express     = require('express');
+var express     = require('express');
 var mongoose    = require('mongoose');
 var bodyParser  = require('body-parser');
 var articleCtrl = require('./controllers/article');
@@ -42,7 +42,7 @@ router.route('/processFeed').
 router.route('/searchNews').
   get(authCtrl.isAuthenticated, srchCtrl.searchNews);
 
-// Create endpoint handler for /scrubArticle 
+// Create endpoint handler for /scrubArticle
 router.route('/scrubArticle').
   get(authCtrl.isAuthenticated, articleCtrl.scrubArticle);
 
@@ -61,7 +61,7 @@ router.route('/articles/:article_id')
   .delete(authCtrl.isAuthenticated, articleCtrl.deleteArticle)
   .get(authCtrl.isAuthenticated, articleCtrl.getArticle)
   .put(authCtrl.isAuthenticated, articleCtrl.putArticle);
-  
+
 
 // Register all our routes with /api
 app.use('/api', router);
