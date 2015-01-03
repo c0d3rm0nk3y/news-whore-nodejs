@@ -40,7 +40,15 @@ router.route('/processFeed').
 
 // Create endpoint handler for /searchNews
 router.route('/searchNews').
-  get(authCtrl.isAuthenticated, srchCtrl.searchNews);
+  post(authCtrl.isAuthenticated, srchCtrl.searchNews);
+
+// Create endpoint handler for /getSearches
+router.route('/getSearches').
+  get(authCtrl.isAuthenticated, srchCtrl.getSearches);
+
+// create endpoint handler for /getSearch/:search_id
+router.route('/getSearch').
+  get(authCtrl.isAuthenticated, srchCtrl.getSearch);
 
 // Create endpoint handler for /scrubArticle
 router.route('/scrubArticle').

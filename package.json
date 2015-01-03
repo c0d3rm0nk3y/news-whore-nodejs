@@ -12,6 +12,7 @@
     "passport-google-oauth" : "*",
     "google-feed-api": "*",
     "feed-read" : "*",
+    "webworker-threads" : "*",
     "q" : "*",
     "node-readability" : "*",
     "htmlstrip-native" : "*"

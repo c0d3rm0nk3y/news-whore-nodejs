@@ -1,14 +1,15 @@
-var newswhore = require('./newswhore');
-var gfeed     = require('google-feed-api');
-var q         = require('q');
-var feed      = require('feed-read');
-var url       = require('url');
+var newswhore  = require('./newswhore');
+var gfeed      = require('google-feed-api');
+var q          = require('q');
+var feed       = require('feed-read');
+var url        = require('url');
 var html_strip = require('htmlstrip-native');
 var read       = require('node-readability');
-var options = {
-        include_script : false,
-        include_style : false,
-        compact_whitespace : true };
+var Worker     = require('webworker-threads').Worker;
+var Search     = require('../models/search');
+var options    = { include_script : false,
+                   include_style : false,
+                   compact_whitespace : true };
 
 exports.findFeeds = function(req, res) {
   var keywords = req.query.keywords; // word+word+word
@@ -28,21 +29,6 @@ exports.findFeeds = function(req, res) {
     });
   } catch(e) { res.send(e);}
 }
-
-/**
-exports.scrubArticle = function(req, res) {
-  console.log('%s: scrubArticle()', new Date().toTimeString());
-  try {
-    var link = req.query.link;
-    var index = req.query.index;
-    getReadability(link, index).then(function(response) {
-      console.log(JSON.stringify(response, null, 2));
-      res.json(response);
-    });
-
-  } catch(ex) { console.log('scrubArticle() ex: %s', ex); }
-}
-**/
 
 getReadability = function(link, index) {
   console.log('%s: getReadability()\nindex:%s\n%s\n', new Date().toTimeString(), index, link);
@@ -105,48 +91,78 @@ exports.processFeed = function(req, res) {
   }
 }
 
-exports.searchNews = function(req, res) {
-  var keywords = req.query.keywords;
-  console.log('searchNews()...\nkeywords: %s', keywords);
-  var link = 'https://news.google.com/news?q='+ keywords.split(' ').join('+') + '&num=100&output=rss&scoring=n';
-
+exports.getSearch = function(req, res) {
+  var searchId = req.query.searchId;
+  var uId = req.user._id;
+  
+  console.log('%s: getSearch()\nSearch Id: %s\nUser Id: %s', new Date().toTimeString(), searchId, uId );
   try {
-    // get rss
-    feed(link, function(err, articles) {
-      if(err) { res.send(err); }
-      var results = { type: "search", content: [] };
-      for(var i=0; i<articles.length; i++) {
-        results.content.push(
-          {
-            title: '',
-            link: gup('url', articles[i].link),
-            published: articles[i].published,
-            body: ''
-          }
-
-        );
+    Search.findOne({userId: uId, searchId: searchId}, function(err,found) {
+      if(err) { res.json({message: failure, error: err}); }
+      
+      if(found === null) {
+        res.json({ message: "no matching search of keywords assigned to logged in user"});
+      } else {
+        res.json({ message: "search found!", search: found});
       }
-      res.json(results);
     });
+    
   } catch(ex) {
-    console.log(ex); res.send(ex);
+    console.log('%s: getSearch() ex:', new Date().toTimeString(), ex);
+    res.json({exceptipon: ex});
   }
 }
 
-
-function daydiff(dateToTest) {
-  var second = new Date(dateToTest);
-  var today = new Date();
-  return (today -second)/(1000*60*60*24);
+exports.getSearches = function(req, res) {
+  var uId = req.user._id;
+  console.log('%s: getSearches()..', new Date().toTimeString());
+  Search.find({userId: uId}, function(err, results) {
+    if(err) {
+      console.log('%s: getSearches().Search.find() err: ', new Date().toTimeString(), err);
+      res.json({message: 'search errored', err: err});
+    } else {
+      console.log('%s: getSearches().Search.find()\n', new Date().toTimeString(), results);
+      res.json(results);
+    }
+  });
 }
 
-function gup( name, link ) {
-  name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-  var regexS = "[\\?&]"+name+"=([^&#]*)";
-  var regex = new RegExp( regexS );
-  var results = regex.exec( link );
-  if( results === null )
-    return null;
-  else
-    return results[1];
+exports.searchNews = function(req, res) {
+  console.log('%s: searchNews()...', new Date().toTimeString());
+  var keywords = req.query.keywords;
+  var uId = req.user._id;
+  
+  // check to see if search exists in db
+  Search.findOne({userId: uId, keywords: keywords}, function(err, found) {
+    if(err) { res.json({ message: "error detected in db search", err: err}); }
+    console.log('%s: searchNews().Search.findOne()..', new Date().toTimeString());
+    if(found === null) { // not found..
+      console.log('%s: searchNews().Search.findOne(): not found,creating..', new Date().toString());
+      // create search db entry
+      var s = new Search();
+      s.userId = uId;
+      s.keywords = keywords;
+      s.submitted = new Date();
+      s.status = "";
+      s.state = "";
+      // save
+      
+      //newswhore.searchForArticles(keywords, uId, s._id);
+      s.save(function(err) {
+        if(err) { res.json({ message: "saving new search failed", err: err}); }
+        // respond with search _id
+        res.json({message: "new search saved..", search: s});
+        console.log('%s: searchNews().Search.findOne().article.save() successful', new Date().toTimeString());
+        // send searchId, userId, keywords off for processing
+        newswhore.searchForArticles(keywords, uId, s._id);
+      });
+    } else {  // found!  
+      console.log('%s: searchNews().Search.findOne(): found!', new Date().toTimeString());
+      // respond with existing searchID,
+      res.json({message: "search already exsists.. updating found articles", search: found});
+      newswhore.searchForArticles(keywords, uId, found._id);
+    }
+  });
+  
 }
+
